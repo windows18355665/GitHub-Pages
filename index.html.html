@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사용자 브라우저</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background: url("https://source.unsplash.com/random/1920x1080/?city,night") no-repeat center center/cover;
+            color: white;
+        }
+        .overlay {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        #search-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        #search-bar {
+            width: 60%;
+            padding: 12px;
+            font-size: 18px;
+            border-radius: 10px;
+            border: none;
+        }
+        #search-engine {
+            padding: 12px;
+            font-size: 18px;
+            border-radius: 10px;
+            border: none;
+        }
+        #search-btn {
+            padding: 12px 18px;
+            font-size: 18px;
+            border: none;
+            background: orange;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        #notice-board, #weather, #kakao-tv {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px auto;
+            width: 80%;
+        }
+        .thumbnail {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="overlay">
+        <h1>사용자 브라우저</h1>
+
+        <!-- 검색창 및 검색 엔진 선택 -->
+        <div id="search-container">
+            <input type="text" id="search-bar" placeholder="검색하기" onkeypress="handleKeyPress(event)">
+            <select id="search-engine">
+                <option value="google">Google</option>
+                <option value="bing">Bing</option>
+                <option value="duckduckgo">DuckDuckGo</option>
+            </select>
+            <button id="search-btn" onclick="search()">🔍 검색</button>
+        </div>
+
+        <!-- 공지사항 -->
+        <div id="notice-board">
+            <h3>📢 공지사항</h3>
+            <p id="notice-text">관리자가 설정한 공지사항이 여기에 표시됩니다.</p>
+        </div>
+
+        <!-- 날씨 -->
+        <div id="weather">
+            <h3>🌤 현재 날씨</h3>
+            <p id="weather-info">날씨 데이터를 불러오는 중...</p>
+        </div>
+
+        <!-- 카카오TV 썸네일 -->
+        <div id="kakao-tv">
+            <h3>📺 카카오TV 라이브</h3>
+            <a href="https://tv.kakao.com/live#none" target="_blank">
+                <img src="https://t1.kakaocdn.net/tv/live/img/pc/live_on_air.png" class="thumbnail" alt="카카오TV 썸네일">
+            </a>
+        </div>
+
+    </div>
+
+    <script>
+        function search() {
+            const query = document.getElementById("search-bar").value;
+            const engine = document.getElementById("search-engine").value;
+            let url = "";
+
+            if (engine === "google") {
+                url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+            } else if (engine === "bing") {
+                url = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
+            } else if (engine === "duckduckgo") {
+                url = `https://duckduckgo.com/?q=${encodeURIComponent(query)}`;
+            }
+
+            if (query) {
+                window.open(url, "_blank");
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                search();
+            }
+        }
+
+        async function loadWeather() {
+            try {
+                const response = await fetch("https://wttr.in/Seoul?format=%C+%t");
+                const data = await response.text();
+                document.getElementById("weather-info").innerText = data;
+            } catch (error) {
+                document.getElementById("weather-info").innerText = "날씨 정보를 가져올 수 없습니다.";
+            }
+        }
+
+        function loadSettings() {
+            document.getElementById("notice-text").innerText = localStorage.getItem("adminNotice") || "공지 없음";
+            loadWeather();
+        }
+
+        window.onload = loadSettings;
+    </script>
+
+</body>
+</html>
+
+
+           
